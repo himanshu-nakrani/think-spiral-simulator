@@ -22,7 +22,7 @@ export const api = {
     mode: ThinkMode
   ): Promise<SimulationResponse> {
     try {
-      const response = await apiClient.post<SimulationResponse>('/simulate', {
+      const response = await apiClient.post<SimulationResponse>('/api/simulate', {
         initial_thought: initialThought,
         mode,
       });
@@ -36,7 +36,7 @@ export const api = {
   async realityCheck(spiralId: string): Promise<RealityCheckResponse> {
     try {
       const response = await apiClient.post<RealityCheckResponse>(
-        '/reality-check',
+        '/api/reality-check',
         {
           spiral_id: spiralId,
         }
@@ -50,7 +50,7 @@ export const api = {
 
   async getHistory(): Promise<HistoryResponse> {
     try {
-      const response = await apiClient.get<HistoryResponse>('/history');
+      const response = await apiClient.get<HistoryResponse>('/api/history');
       return response.data;
     } catch (error) {
       console.error('Error fetching history:', error);
@@ -60,7 +60,7 @@ export const api = {
 
   async getInsights(): Promise<InsightsResponse> {
     try {
-      const response = await apiClient.get<InsightsResponse>('/insights');
+      const response = await apiClient.get<InsightsResponse>('/api/insights');
       return response.data;
     } catch (error) {
       console.error('Error fetching insights:', error);
