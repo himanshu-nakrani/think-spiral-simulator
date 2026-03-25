@@ -1,0 +1,56 @@
+name: Deploy Backend to Hugging Face Space
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend-hf-space.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Hugging Face Hub
+        run: pip install huggingface_hub
+
+      - name: Upload backend folder to Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ.get("HF_TOKEN")
+          repo_id = os.environ.get("HF_SPACE_ID")
+
+          if not token:
+            raise RuntimeError("Missing HF_TOKEN secret.")
+          if not repo_id:
+            raise RuntimeError("Missing HF_SPACE_ID repo variable (format: username/space-name).")
+
+          api = HfApi(token=token)
+          api.upload_folder(
+            folder_path="backend",
+            repo_id=repo_id,
+            repo_type="space",
+            ignore_patterns=[
+              ".venv/**",
+              "__pycache__/**",
+              "*.pyc",
+              "thinkspiral.db",
+            ],
+          )
+          print(f"Uploaded backend to Space: {repo_id}")
+          PY

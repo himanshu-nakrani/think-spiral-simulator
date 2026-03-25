@@ -65,4 +65,33 @@ class HistoryResponse(BaseModel):
 class InsightsResponse(BaseModel):
     commonPatterns: List[str]
     emotionalTrends: dict
+    patternDetection: dict
     recommendations: List[str]
+
+
+class BreakSpiralRequest(BaseModel):
+    spiral_id: str
+
+
+class BreakSpiralItem(BaseModel):
+    thought: str
+    rationalCounter: str
+
+
+class BreakSpiralResponse(BaseModel):
+    reframes: List[BreakSpiralItem]
+
+
+class CompareModesRequest(BaseModel):
+    initial_thought: str
+    primary_mode: str
+    compare_mode: str
+
+
+class CompareModesResponse(BaseModel):
+    primaryMode: str
+    compareMode: str
+    primaryThoughts: List[ThoughtSchema]
+    primaryEmotionScores: List[float]
+    compareThoughts: List[ThoughtSchema]
+    compareEmotionScores: List[float]

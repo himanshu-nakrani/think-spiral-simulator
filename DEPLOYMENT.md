@@ -5,110 +5,65 @@ This guide explains how to deploy ThinkSpiral to production.
 ## Architecture Overview
 
 ThinkSpiral has two independent deployment targets:
-- **Frontend**: Deployed to Vercel (or any static host)
-- **Backend**: Deployed to a Python-capable host
+- **Frontend**: Deployed to GitHub Pages (static export)
+- **Backend**: Deployed to Hugging Face Spaces (Docker)
 
-## Frontend Deployment (Vercel)
+## Quick Setup (GitHub Pages + Hugging Face)
 
-### Option 1: Direct Vercel Deployment
+### 1) One-time repository settings
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variable:
-   - `NEXT_PUBLIC_API_URL`: Your backend API URL (e.g., `https://api.thinkspiral.com`)
-4. Deploy
+In your GitHub repo:
 
-### Option 2: Manual Deployment
+1. **Settings → Pages**
+   - Source: **GitHub Actions**
+2. **Settings → Secrets and variables → Actions**
+   - Add repository **variable**: `NEXT_PUBLIC_API_URL`
+     - Example: `https://<your-space-name>.hf.space`
+   - Add repository **variable**: `HF_SPACE_ID`
+     - Format: `username/space-name`
+   - Add repository **secret**: `HF_TOKEN`
+     - Hugging Face token with write access to the Space
 
-```bash
-# Build the frontend
-pnpm install
-pnpm build
+### 2) One-time Hugging Face Space setup
 
-# The `out` directory contains static files ready for deployment
-# Upload to your hosting platform (Netlify, Cloudflare Pages, etc.)
-```
+1. Create a new **Space** on Hugging Face.
+2. Choose **Docker** SDK.
+3. In Space settings, add secret:
+   - `GEMINI_API_KEY`
+4. Optional Space variable:
+   - `CORS_ORIGINS=https://<github-username>.github.io`
+   - For project page paths, use your full Pages origin.
 
-## Backend Deployment
+### 3) Deploy flow
 
-### Option 1: Railway (Recommended for Beginners)
+- Push to `main`.
+- `deploy-frontend-pages.yml` publishes frontend to GitHub Pages.
+- `deploy-backend-hf-space.yml` syncs `backend/` to your Hugging Face Space.
+- Frontend uses `NEXT_PUBLIC_API_URL` set in GitHub variables at build time.
 
-1. Create a Railway account at [railway.app](https://railway.app)
-2. Create new project → PostgreSQL template
-3. Add a new service → Deploy from GitHub
-4. Select your repository
-5. Add environment variables in Railway dashboard:
-   ```
-   DATABASE_URL=postgresql://...  # Railway provides this
-   ```
-6. Railway automatically deploys from git push
+## Frontend Deployment (GitHub Pages)
 
-**Update frontend** with backend URL from Railway:
-```
-NEXT_PUBLIC_API_URL=https://your-railway-backend.up.railway.app
-```
+This repository includes `.github/workflows/deploy-frontend-pages.yml`.
+It builds static output (`out/`) and deploys with `actions/deploy-pages`.
 
-### Option 2: Heroku
+Environment variable used at build time:
 
-```bash
-# Install Heroku CLI
-# Login
-heroku login
+- `NEXT_PUBLIC_API_URL` (GitHub Actions repo variable)
 
-# Create app
-heroku create your-app-name
+## Backend Deployment (Hugging Face Spaces)
 
-# Add PostgreSQL
-heroku addons:create heroku-postgresql:mini
+This repository includes `.github/workflows/deploy-backend-hf-space.yml`.
+It uploads the `backend/` directory directly to your Docker Space.
 
-# Deploy
-git push heroku main
-```
+Required:
 
-### Option 3: AWS Elastic Beanstalk
+- `HF_SPACE_ID` GitHub variable (e.g. `himanshu-nakrani/thinkspiral-backend`)
+- `HF_TOKEN` GitHub secret (write access token)
 
-```bash
-# Install EB CLI
-pip install awsebcli
+Space runtime settings:
 
-# Initialize
-eb init -p python-3.11 thinkspiral
-
-# Create environment
-eb create production
-
-# Deploy
-eb deploy
-
-# Get URL
-eb open
-```
-
-### Option 4: Docker Deployment
-
-Create `backend/Dockerfile`:
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-RUN pip install uv
-COPY backend/pyproject.toml backend/uv.lock* ./
-
-RUN uv sync --frozen
-
-COPY backend .
-
-EXPOSE 8000
-
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-Build and run:
-```bash
-docker build -t thinkspiral-backend -f backend/Dockerfile .
-docker run -p 8000:8000 -e DATABASE_URL=postgresql://... thinkspiral-backend
-```
+- Secret: `GEMINI_API_KEY`
+- Optional variable: `CORS_ORIGINS=https://<github-username>.github.io`
 
 ## Database Setup for Production
 

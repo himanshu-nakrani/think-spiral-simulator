@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, DateTime, Text, Float
+from sqlalchemy import Column, String, Integer, DateTime, Text, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from app.models.base import Base
 
@@ -13,15 +13,19 @@ class Spiral(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     reality_check = Column(Text, nullable=True)
 
-    thoughts = relationship("Thought", back_populates="spiral")
-    insights = relationship("Insight", back_populates="spiral")
+    thoughts = relationship(
+        "Thought", back_populates="spiral", cascade="all, delete-orphan"
+    )
+    insights = relationship(
+        "Insight", back_populates="spiral", cascade="all, delete-orphan"
+    )
 
 
 class Thought(Base):
     __tablename__ = "thoughts"
 
     id = Column(String, primary_key=True, index=True)
-    spiral_id = Column(String, index=True)
+    spiral_id = Column(String, ForeignKey("spirals.id"), index=True, nullable=False)
     text = Column(Text)
     emotion_score = Column(Float)
     level = Column(Integer)
@@ -34,7 +38,7 @@ class Insight(Base):
     __tablename__ = "insights"
 
     id = Column(String, primary_key=True, index=True)
-    spiral_id = Column(String, index=True)
+    spiral_id = Column(String, ForeignKey("spirals.id"), index=True, nullable=False)
     text = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
 

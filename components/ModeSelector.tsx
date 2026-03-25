@@ -1,7 +1,7 @@
 'use client';
 
 import { ThinkMode } from '@/lib/types';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 interface ModeSelectorProps {
   selectedMode: ThinkMode;
@@ -31,25 +31,28 @@ export function ModeSelector({
   onModeChange,
 }: ModeSelectorProps) {
   return (
-    <div className="space-y-3">
-      <label className="text-sm font-semibold text-slate-200">
+    <div className="space-y-4">
+      <label className="text-sm font-semibold text-slate-100">
         Choose Your Spiral Pattern
       </label>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
         {MODES.map((mode) => (
-          <Button
+          <motion.button
             key={mode.id}
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => onModeChange(mode.id)}
-            variant={selectedMode === mode.id ? 'default' : 'outline'}
-            className={`flex flex-col items-center gap-1 py-6 ${
+            className={`relative w-full rounded-xl px-4 py-3 text-left transition-all duration-200 ${
               selectedMode === mode.id
-                ? 'border-purple-600 bg-purple-600/20 text-purple-200'
-                : 'border-slate-700 text-slate-300 hover:border-slate-600'
+                ? 'border border-purple-400/50 bg-gradient-to-r from-purple-500/25 to-pink-500/25 text-purple-100 shadow-lg shadow-purple-900/20'
+                : 'border border-transparent text-slate-300 hover:border-white/10 hover:bg-white/5'
             }`}
           >
-            <div className="font-semibold">{mode.label}</div>
-            <div className="text-xs text-slate-400">{mode.description}</div>
-          </Button>
+            <div className="w-full">
+              <div className="font-medium">{mode.label}</div>
+              <div className="mt-1 text-xs text-muted">{mode.description}</div>
+            </div>
+          </motion.button>
         ))}
       </div>
     </div>

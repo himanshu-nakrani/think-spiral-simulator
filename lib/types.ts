@@ -29,6 +29,24 @@ export interface RealityCheckResponse {
   insights: string[];
 }
 
+export interface BreakSpiralItem {
+  thought: string;
+  rationalCounter: string;
+}
+
+export interface BreakSpiralResponse {
+  reframes: BreakSpiralItem[];
+}
+
+export interface CompareModesResponse {
+  primaryMode: ThinkMode;
+  compareMode: ThinkMode;
+  primaryThoughts: Thought[];
+  primaryEmotionScores: number[];
+  compareThoughts: Thought[];
+  compareEmotionScores: number[];
+}
+
 export interface HistoryResponse {
   entries: SpiralEntry[];
 }
@@ -39,6 +57,12 @@ export interface InsightsResponse {
     average: number;
     peak: number;
     mode: ThinkMode;
+  };
+  patternDetection: {
+    dominantTopic: string;
+    commonTrigger: string;
+    peakHour: number | null;
+    peakWeekday: string | null;
   };
   recommendations: string[];
 }

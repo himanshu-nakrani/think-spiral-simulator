@@ -4,7 +4,13 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.schemas.spiral import SimulationRequest, SimulationResponse, ThoughtSchema
+from app.schemas.spiral import (
+    SimulationRequest,
+    SimulationResponse,
+    ThoughtSchema,
+    CompareModesRequest,
+    CompareModesResponse,
+)
 from app.models.spiral import Spiral, Thought
 from app.services.ai_service import AIService
 from app.database import get_db
@@ -78,4 +84,44 @@ async def simulate_spiral(
         id=spiral_id,
         thoughts=thoughts_response,
         emotionScores=emotion_scores,
+    )
+
+
+@router.post("/compare-modes", response_model=CompareModesResponse)
+async def compare_modes(
+    request: CompareModesRequest,
+):
+    primary_thoughts, primary_scores = ai_service.generate_spiral(
+        request.initial_thought, request.primary_mode
+    )
+    compare_thoughts, compare_scores = ai_service.generate_spiral(
+        request.initial_thought, request.compare_mode
+    )
+
+    primary_response = [
+        ThoughtSchema(
+            id=t["id"],
+            text=t["text"],
+            emotionScore=t["emotionScore"],
+            timestamp=datetime.utcnow(),
+        )
+        for t in primary_thoughts
+    ]
+    compare_response = [
+        ThoughtSchema(
+            id=t["id"],
+            text=t["text"],
+            emotionScore=t["emotionScore"],
+            timestamp=datetime.utcnow(),
+        )
+        for t in compare_thoughts
+    ]
+
+    return CompareModesResponse(
+        primaryMode=request.primary_mode,
+        compareMode=request.compare_mode,
+        primaryThoughts=primary_response,
+        primaryEmotionScores=primary_scores,
+        compareThoughts=compare_response,
+        compareEmotionScores=compare_scores,
     )
