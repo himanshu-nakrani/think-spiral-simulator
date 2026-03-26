@@ -331,6 +331,40 @@ export default function Home() {
                 </>
               )}
 
+              {isLoading && thoughts.length === 0 && !error && (
+                <div className="space-y-4">
+                  <div className="glass-surface rounded-2xl p-5">
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="h-7 w-44 rounded-xl skeleton-shimmer" />
+                      <div className="h-5 w-28 rounded-xl skeleton-shimmer" />
+                    </div>
+                    <div className="relative">
+                      <div className="absolute bottom-0 left-2 top-0 w-0.5 bg-white/10" />
+                      <div className="max-h-[34rem] space-y-4 overflow-y-auto scrollbar-thin pl-10 pr-1">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <div key={index} className="flex gap-4">
+                            <div className="absolute left-0 mt-2 h-4 w-4 rounded-full bg-white/10 skeleton-shimmer" />
+                            <div className="w-full rounded-xl border border-white/10 bg-white/5 p-4">
+                              <div className="mb-3 h-4 w-3/4 rounded skeleton-shimmer" />
+                              <div className="mb-3 h-4 w-2/3 rounded skeleton-shimmer" />
+                              <div className="h-6 w-24 rounded-full skeleton-shimmer" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="glass-surface rounded-2xl p-6">
+                    <div className="mb-4 flex items-center justify-between">
+                      <div className="h-8 w-64 rounded-xl skeleton-shimmer" />
+                      <div className="h-5 w-24 rounded-xl skeleton-shimmer" />
+                    </div>
+                    <div className="h-[250px] w-full rounded-2xl border border-white/10 bg-white/5 skeleton-shimmer" />
+                  </div>
+                </div>
+              )}
+
               {!isLoading && thoughts.length === 0 && !error && (
                 <div className="glass-surface rounded-2xl p-10 text-center shadow-xl shadow-black/20">
                   <div className="text-slate-300/90">

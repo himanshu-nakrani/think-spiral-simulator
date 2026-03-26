@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { Activity, Flame, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface EmotionChartProps {
   emotionScores: number[];
@@ -32,11 +33,17 @@ export function EmotionChart({ emotionScores }: EmotionChartProps) {
   const maxScore = Math.max(...emotionScores);
 
   return (
-    <Card className="p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-3xl font-semibold tracking-tight text-slate-100">
-          Emotional Trajectory
-        </h3>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+      <Card className="p-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h3 className="text-3xl font-semibold tracking-tight text-slate-100">
+              Emotional Trajectory
+            </h3>
+            <p className="mt-1 text-sm text-muted">
+              Peak intensity highlights where the spiral tightens.
+            </p>
+          </div>
         <div className="flex gap-3 text-sm">
           <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
             <div className="flex items-center gap-1 text-xs text-muted">
@@ -60,10 +67,10 @@ export function EmotionChart({ emotionScores }: EmotionChartProps) {
             <div className="font-bold text-cyan-300">Rising</div>
           </div>
         </div>
-      </div>
+        </div>
 
-      <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <defs>
             <linearGradient id="emotionStroke" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#7C3AED" />
@@ -91,8 +98,9 @@ export function EmotionChart({ emotionScores }: EmotionChartProps) {
             activeDot={{ r: 6 }}
             strokeWidth={3}
           />
-        </LineChart>
-      </ResponsiveContainer>
-    </Card>
+          </LineChart>
+        </ResponsiveContainer>
+      </Card>
+    </motion.div>
   );
 }

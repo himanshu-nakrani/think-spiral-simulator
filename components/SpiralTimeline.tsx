@@ -3,6 +3,7 @@
 import { Thought } from '@/lib/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AlertTriangle, Flame, Smile } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SpiralTimelineProps {
@@ -22,7 +23,7 @@ export function SpiralTimeline({ thoughts }: SpiralTimelineProps) {
         <div className="absolute bottom-0 left-2 top-0 w-0.5 bg-gradient-to-b from-purple-500 via-pink-500 to-cyan-400 shadow-[0_0_18px_rgba(124,58,237,0.7)]" />
 
         {/* Thoughts */}
-        <div className="max-h-[34rem] space-y-4 overflow-y-auto pl-10 pr-1">
+        <div className="max-h-[34rem] space-y-4 overflow-y-auto scrollbar-thin pl-10 pr-1">
           {thoughts.map((thought, index) => (
             <motion.div
               key={thought.id}
@@ -31,8 +32,30 @@ export function SpiralTimeline({ thoughts }: SpiralTimelineProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: index * 0.08 }}
             >
+              {(() => {
+                const score = thought.emotionScore;
+                const isCalm = score < 40;
+                const isConcern = score >= 40 && score < 70;
+
+                const Icon = isCalm ? Smile : isConcern ? AlertTriangle : Flame;
+                const label = isCalm ? 'Calm' : isConcern ? 'Concern' : 'Panic';
+                const badgeBg = isCalm
+                  ? 'from-cyan-500/30 to-emerald-500/25'
+                  : isConcern
+                    ? 'from-amber-500/30 to-pink-500/20'
+                    : 'from-rose-500/30 to-fuchsia-500/25';
+                const badgeText = isCalm
+                  ? 'text-cyan-100'
+                  : isConcern
+                    ? 'text-amber-100'
+                    : 'text-rose-100';
+
+                return (
+                  <>
               {/* Dot indicator */}
-              <div className="absolute left-0 mt-2 h-4 w-4 animate-pulse rounded-full border-2 border-slate-900 bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_0_14px_rgba(236,72,153,0.8)]" />
+                  <div
+                    className={`absolute left-0 mt-2 h-4 w-4 animate-pulse rounded-full border-2 border-slate-900 bg-gradient-to-r ${badgeBg} shadow-[0_0_14px_rgba(236,72,153,0.8)]`}
+                  />
 
               {/* Card */}
               <Card className="w-full p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
@@ -44,12 +67,19 @@ export function SpiralTimeline({ thoughts }: SpiralTimelineProps) {
                     <p className="text-slate-100">{thought.text}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <Badge className="border-transparent bg-gradient-to-r from-purple-500/30 to-pink-500/30 px-2.5 py-1 text-[11px] text-purple-100 shadow-[0_0_12px_rgba(124,58,237,0.35)]">
-                      Intensity {Math.round(thought.emotionScore)}
+                    <Badge
+                      variant="outline"
+                      className={`border-transparent bg-gradient-to-r ${badgeBg} px-2.5 py-1 text-[11px] shadow-[0_0_12px_rgba(124,58,237,0.35)] ${badgeText}`}
+                    >
+                      <Icon className="mr-1 inline h-3.5 w-3.5" />
+                      {label} · {Math.round(score)}
                     </Badge>
                   </div>
                 </div>
               </Card>
+                  </>
+                );
+              })()}
             </motion.div>
           ))}
         </div>
